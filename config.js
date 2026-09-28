@@ -8,13 +8,12 @@
 
 window.HERO_CONFIG = {
   // ⚙️ الإعدادات
-  GOOGLE_CLIENT_ID: "ضع-Client-ID-هنا.apps.googleusercontent.com",
-  API_URL: "ضع-رابط-Apps-Script-هنا/exec",
+  GOOGLE_CLIENT_ID: "712597494558-b0ufvoameo8pfnqmrf0itto30h103bru.apps.googleusercontent.com",
+  API_URL: "https://script.google.com/macros/s/AKfycbx3PhaCLdQAFyFdPVuDlL2CjHf7SuqQZG4w8sXZX8gzW9BgTNYOINKojv239cM0M98A4A/exec",
 
-  // 🕐 الجلسة
-  SESSION_DAYS: 30,           // صلاحية الجلسة (يوم)
-  SYNC_TTL_MS: 60 * 60 * 1000, // تحديث صامت كل ساعة
-  HEARTBEAT_MS: 24 * 60 * 60 * 1000, // فحص الحالة كل يوم
+ // 🕐 الجلسة والأمان
+  SESSION_DAYS: 30,      // صلاحية التوكن (30 يومًا)
+  HEARTBEAT_DAYS: 30,    // فحص الحالة (مرة كل 30 يومًا فقط)
 
   // 🔑 مفاتيح التخزين المحلي
   LS_AGENT_KEY: "hero_agent_v1",
@@ -26,3 +25,4 @@ window.HERO_CONFIG = {
   BRAND: "Hero Academy",
   SUPPORT_EMAIL: "info@hero1.vip"
 };
+
