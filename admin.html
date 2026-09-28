@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>لوحة المدير | Hero Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root{--p:#0f4c81;--p2:#1e6091;--a:#0ea5e9;--bg:#f8fafc;--card:#fff;--t:#0f172a;--m:#64748b;--b:#e2e8f0;--ok:#10b981;--warn:#f59e0b;--dg:#dc2626;--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--t);line-height:1.7}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+[hidden]{display:none!important}
+
+/* Header */
+.hd{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--b)}
+.hd-in{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;gap:.6rem;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:.6rem;font-weight:800}
+.brand-mk{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--p),var(--a));color:#fff;font-size:1.1rem}
+.brand strong{font-size:1rem}
+.brand small{display:block;color:var(--m);font-size:.7rem;font-weight:600}
+.hd-act{display:flex;gap:.5rem;flex-wrap:wrap}
+.email-pill{background:#f1f5f9;color:var(--m);padding:.35rem .75rem;border-radius:999px;font-size:.8rem;font-weight:700}
+
+/* Layout */
+.wrap{max-width:1400px;margin:0 auto;padding:1rem;display:grid;grid-template-columns:240px 1fr;gap:1rem}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+.side{background:#fff;border:1px solid var(--b);border-radius:var(--r);padding:.6rem;position:sticky;top:80px;height:fit-content}
+@media(max-width:900px){.side{position:static}}
+.nav-btn{display:block;width:100%;text-align:right;background:transparent;border:0;padding:.7rem .8rem;border-radius:10px;font-weight:700;color:var(--m);font-size:.9rem;transition:.15s;margin-bottom:.15rem}
+.nav-btn:hover{background:#f1f5f9;color:var(--p)}
+.nav-btn.on{background:var(--p);color:#fff}
+
+.main{display:grid;gap:1rem}
+.panel{background:#fff;border:1px solid var(--b);border-radius:var(--r);padding:1.2rem}
+.panel h2{font-size:1.15rem;margin-bottom:1rem}
+.panel h3{font-size:1rem;margin:.8rem 0 .5rem;color:var(--p2)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem;margin-bottom:1rem}
+.stat{background:#f8fafc;border:1px solid var(--b);border-radius:12px;padding:1rem;text-align:center}
+.stat span{display:block;font-size:.75rem;color:var(--m);font-weight:700;margin-bottom:.2rem}
+.stat strong{font-size:1.3rem;color:var(--p)}
+.stat.warn strong{color:var(--dg)}
+
+/* Tables */
+.tbl{width:100%;border-collapse:collapse;font-size:.85rem}
+.tbl th,.tbl td{padding:.55rem .5rem;text-align:right;border-bottom:1px solid var(--b);white-space:nowrap}
+.tbl th{background:#f8fafc;font-weight:800;color:var(--p2);font-size:.78rem;position:sticky;top:0}
+.tbl tr:hover{background:#f8fafc}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--b);border-radius:12px;max-height:600px;overflow-y:auto}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;border-radius:10px;padding:.55rem .9rem;font-weight:700;font-size:.85rem;border:1px solid transparent;transition:.15s;background:#fff;color:var(--t)}
+.btn-p{background:var(--p);color:#fff}
+.btn-p:hover{background:var(--p2)}
+.btn-s{border-color:var(--b)}
+.btn-s:hover{border-color:var(--p);color:var(--p)}
+.btn-d{background:#fef2f2;color:var(--dg);border-color:#fecaca}
+.btn-ok{background:#f0fdf4;color:#065f46;border-color:#bbf7d0}
+.btn-w{background:#fffbeb;color:#92400e;border-color:#fed7aa}
+.btn-sm{padding:.35rem .6rem;font-size:.75rem}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+
+/* Tags */
+.tag{display:inline-block;font-size:.7rem;font-weight:800;padding:.2rem .55rem;border-radius:999px;white-space:nowrap}
+.tag.active,.tag.approved,.tag.confirmed,.tag.paid{background:#d1fae5;color:#065f46}
+.tag.pending{background:#fef3c7;color:#92400e}
+.tag.suspended,.tag.rejected,.tag.deleted{background:#fee2e2;color:#991b1b}
+.tag.refunded{background:#ede9fe;color:#5b21b6}
+
+/* Form */
+.form{display:grid;gap:.7rem}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.6rem}
+.form label{display:grid;gap:.3rem;font-size:.85rem;font-weight:700}
+.form input,.form select,.form textarea{font-family:inherit;font-size:.9rem;padding:.6rem .75rem;border-radius:10px;border:1px solid var(--b);background:#fff;color:var(--t)}
+.form input:focus,.form select:focus,.form textarea:focus{outline:none;border-color:var(--p)}
+.form textarea{min-height:70px;resize:vertical}
+
+/* Modal */
+.md{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.5);padding:1rem}
+.md-c{background:#fff;border-radius:16px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;padding:1.5rem}
+.md-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.7rem;border-bottom:1px solid var(--b)}
+.md-h h3{font-size:1.1rem}
+
+/* Toast */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:.7rem 1.2rem;border-radius:12px;font-size:.85rem;font-weight:600;z-index:80;max-width:90vw;text-align:center}
+.toast.ok{background:#065f46}
+.toast.err{background:#991b1b}
+
+/* Login */
+.login{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#0f4c81,#0ea5e9)}
+.login-card{background:#fff;border-radius:20px;padding:2.5rem;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.login-card .brand-mk{width:64px;height:64px;font-size:1.8rem;margin:0 auto 1rem}
+.login-card h1{font-size:1.4rem;margin-bottom:.4rem}
+.login-card p{color:var(--m);font-size:.9rem;margin-bottom:1.5rem}
+
+/* Filter chips */
+.chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem}
+.chip{background:#fff;border:1px solid var(--b);padding:.35rem .75rem;border-radius:999px;font-size:.8rem;font-weight:700;color:var(--m);cursor:pointer}
+.chip.on{background:var(--p);color:#fff;border-color:var(--p)}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<section class="login" id="loginView">
+  <div class="login-card">
+    <div class="brand-mk">H</div>
+    <h1>لوحة إدارة الوكلاء</h1>
+    <p>Hero Academy — للدخول، استخدم حساب Google المعتمد.</p>
+    <div id="gBtn"></div>
+  </div>
+</section>
+
+<!-- App -->
+<section id="appView" hidden>
+  <header class="hd">
+    <div class="hd-in">
+      <div class="brand">
+        <span class="brand-mk">H</span>
+        <div><strong>لوحة الإدارة</strong><small>Hero Academy</small></div>
+      </div>
+      <div class="hd-act">
+        <span class="email-pill" id="adminEmail">—</span>
+        <button class="btn btn-s btn-sm" id="refreshBtn">تحديث</button>
+        <button class="btn btn-d btn-sm" id="logoutBtn">خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <aside class="side">
+      <button class="nav-btn on" data-p="dash">📊 لوحة القيادة</button>
+      <button class="nav-btn" data-p="agents">👥 الوكلاء</button>
+      <button class="nav-btn" data-p="courses">📚 الدورات</button>
+      <button class="nav-btn" data-p="prices">💱 الأسعار</button>
+      <button class="nav-btn" data-p="sales">🧾 المبيعات</button>
+      <button class="nav-btn" data-p="transfers">💸 التحويلات</button>
+      <button class="nav-btn" data-p="withdrawals">🏦 السحوبات</button>
+      <button class="nav-btn" data-p="refunds">↩️ الاستردادات</button>
+      <button class="nav-btn" data-p="subagents">🤝 المناديب</button>
+      <button class="nav-btn" data-p="activity">📋 سجل النشاط</button>
+      <button class="nav-btn" data-p="reports">📈 التقارير</button>
+    </aside>
+
+    <main class="main">
+      <div class="panel" id="pDash"><h2>لوحة القيادة</h2><div id="dashContent"></div></div>
+      <div class="panel" id="pAgents" hidden><h2>الوكلاء</h2><div id="agentsContent"></div></div>
+      <div class="panel" id="pCourses" hidden><h2>الدورات</h2><div id="coursesContent"></div></div>
+      <div class="panel" id="pPrices" hidden><h2>الأسعار حسب الدولة</h2><div id="pricesContent"></div></div>
+      <div class="panel" id="pSales" hidden><h2>المبيعات</h2><div id="salesContent"></div></div>
+      <div class="panel" id="pTransfers" hidden><h2>التحويلات</h2><div id="transfersContent"></div></div>
+      <div class="panel" id="pWithdrawals" hidden><h2>السحوبات</h2><div id="withdrawalsContent"></div></div>
+      <div class="panel" id="pRefunds" hidden><h2>الاستردادات</h2><div id="refundsContent"></div></div>
+      <div class="panel" id="pSubagents" hidden><h2>المناديب (لقطة)</h2><div id="subagentsContent"></div></div>
+      <div class="panel" id="pActivity" hidden><h2>سجل النشاط</h2><div id="activityContent"></div></div>
+      <div class="panel" id="pReports" hidden><h2>التقارير</h2><div id="reportsContent"></div></div>
+    </main>
+  </div>
+</section>
+
+<div class="md" id="modal" hidden><div class="md-c"><div class="md-h"><h3 id="mdTitle">—</h3><button class="btn btn-s btn-sm" onclick="closeModal()">✕</button></div><div id="mdBody"></div></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="config.js"></script>
+<script>
+/* ============================================================
+   Admin App
+   ============================================================ */
+const A = { token: null, admin: null, data: null, page: "dash" };
+const $ = (s,r=document) => r.querySelector(s);
+const $$ = (s,r=document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => (Number(n)||0).toLocaleString("ar-EG",{maximumFractionDigits:2});
+const dtFmt = d => { if(!d) return "—"; const t=new Date(d); return isNaN(t)?"—":t.toLocaleDateString("ar-EG",{year:"numeric",month:"short",day:"numeric"}); };
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(m,t=""){ const el=$("#toast"); el.textContent=m; el.className="toast"+(t?" "+t:""); el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true,3500); }
+
+/* ---------- Modal ---------- */
+function openModal(title, html) { $("#mdTitle").textContent=title; $("#mdBody").innerHTML=html; $("#modal").hidden=false; }
+function closeModal() { $("#modal").hidden=true; }
+
+/* ---------- Google Sign-In ---------- */
+function loadGIS() {
+  return new Promise((res) => {
+    if (window.google?.accounts) return res();
+    const s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client";
+    s.onload = res;
+    document.head.appendChild(s);
+  });
+}
+
+async function initGIS() {
+  await loadGIS();
+  google.accounts.id.initialize({
+    client_id: HERO_CONFIG.GOOGLE_CLIENT_ID,
+    callback: handleCredential,
+    auto_select: false
+  });
+  google.accounts.id.renderButton($("#gBtn"), {
+    theme: "filled_blue", size: "large", text: "signin_with", width: 300, locale: "ar"
+  });
+  // محاولة استرجاع الجلسة
+  const saved = localStorage.getItem(HERO_CONFIG.LS_ADMIN_KEY);
+  if (saved) {
+    try {
+      const o = JSON.parse(saved);
+      if (o.exp > Date.now()) {
+        A.token = o.token; A.admin = o.admin;
+        afterLogin();
+        return;
+      }
+    } catch(e){}
+    localStorage.removeItem(HERO_CONFIG.LS_ADMIN_KEY);
+  }
+}
+
+async function handleCredential(res) {
+  try {
+    const r = await api("adminLogin", { id_token: res.credential });
+    if (!r.ok) { toast(r.message||"فشل الدخول.","err"); return; }
+    A.token = r.token; A.admin = r.admin;
+    localStorage.setItem(HERO_CONFIG.LS_ADMIN_KEY, JSON.stringify({
+      token: r.token, admin: r.admin, exp: r.expires_at
+    }));
+    A.data = r.data;
+    afterLogin();
+    toast("مرحبًا "+r.admin.name,"ok");
+  } catch (e) { toast("خطأ الاتصال.","err"); }
+}
+
+function afterLogin() {
+  $("#loginView").hidden = true;
+  $("#appView").hidden = false;
+  $("#adminEmail").textContent = A.admin.email;
+  renderAll();
+}
+
+$("#logoutBtn").addEventListener("click", () => {
+  if (!confirm("خروج؟")) return;
+  localStorage.removeItem(HERO_CONFIG.LS_ADMIN_KEY);
+  A.token = null; A.admin = null; A.data = null;
+  location.reload();
+});
+
+/* ---------- API ---------- */
+async function api(action, payload = {}) {
+  if (!HERO_CONFIG.API_URL || HERO_CONFIG.API_URL.includes("ضع-")) {
+    return { ok:false, message:"لم يتم ربط Apps Script بعد." };
+  }
+  try {
+    const res = await fetch(HERO_CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action, token: A.token, ...payload })
+    });
+    return await res.json();
+  } catch(e) { return { ok:false, message:"تعذر الاتصال." }; }
+}
+
+/* ---------- Nav ---------- */
+$$(".nav-btn").forEach(b => b.addEventListener("click", () => {
+  $$(".nav-btn").forEach(x => x.classList.toggle("on", x === b));
+  $$(".panel").forEach(p => p.hidden = p.id !== "p" + b.dataset.p.charAt(0).toUpperCase() + b.dataset.p.slice(1));
+  A.page = b.dataset.p;
+  renderPage();
+}));
+
+function renderPage() {
+  if (A.page === "dash") renderDash();
+  if (A.page === "agents") renderAgents();
+  if (A.page === "courses") renderCourses();
+  if (A.page === "prices") renderPrices();
+  if (A.page === "sales") renderSales();
+  if (A.page === "transfers") renderTransfers();
+  if (A.page === "withdrawals") renderWithdrawals();
+  if (A.page === "refunds") renderRefunds();
+  if (A.page === "subagents") renderSubAgents();
+  if (A.page === "activity") renderActivity();
+  if (A.page === "reports") renderReports();
+}
+
+/* ---------- Refresh ---------- */
+$("#refreshBtn").addEventListener("click", async () => {
+  const r = await api("adminSync");
+  if (r.ok) { A.data = r.data; renderAll(); toast("تم التحديث.","ok"); }
+  else toast(r.message||"تعذر التحديث.","err");
+});
+
+function renderAll() { if (A.data) renderPage(); }
+
+/* ---------- Dashboard ---------- */
+function renderDash() {
+  const d = A.data || {};
+  const sales = d.sales || [];
+  const agents = d.agents || [];
+  const transfers = d.transfers || [];
+  const withdrawals = d.withdrawals || [];
+  const refunds = d.refunds || [];
+
+  const pendingSales = sales.filter(s => s.status === "pending").length;
+  const pendingTransfers = transfers.filter(t => t.status === "pending").length;
+  const pendingWithdrawals = withdrawals.filter(w => w.status === "pending").length;
+  const pendingRefunds = refunds.filter(r => r.status === "pending").length;
+  const activeAgents = agents.filter(a => a.status === "active").length;
+  const totalDebt = agents.reduce((s,a) => s + (Number(a.debt_to_academy)||0), 0);
+
+  $("#dashContent").innerHTML = `
+    <div class="stats">
+      <div class="stat"><span>الوكلاء النشطون</span><strong>${activeAgents}</strong></div>
+      <div class="stat"><span>إجمالي المبيعات</span><strong>${sales.length}</strong></div>
+      <div class="stat ${pendingSales?'warn':''}"><span>مبيعات معلقة</span><strong>${pendingSales}</strong></div>
+      <div class="stat ${pendingTransfers?'warn':''}"><span>تحويلات معلقة</span><strong>${pendingTransfers}</strong></div>
+      <div class="stat ${pendingWithdrawals?'warn':''}"><span>سحوبات معلقة</span><strong>${pendingWithdrawals}</strong></div>
+      <div class="stat ${pendingRefunds?'warn':''}"><span>استردادات معلقة</span><strong>${pendingRefunds}</strong></div>
+      <div class="stat"><span>إجمالي الديون</span><strong>$${money(totalDebt)}</strong></div>
+      <div class="stat"><span>إجمالي الدورات</span><strong>${(d.courses||[]).length}</strong></div>
+    </div>
+    <h3>آخر 10 عمليات</h3>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>النوع</th><th>المعرّف</th><th>الوكيل</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+        <tbody>${renderRecentActivity()}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderRecentActivity() {
+  const acts = (A.data.activity || []).slice(0, 10);
+  if (!acts.length) return `<tr><td colspan="5" style="text-align:center;color:#64748b">لا يوجد نشاط</td></tr>`;
+  return acts.map(a => `<tr>
+    <td>${esc(a.action)}</td>
+    <td dir="ltr">${esc(a.actor_email || a.details || "—")}</td>
+    <td>${esc(a.actor_type)}</td>
+    <td>—</td>
+    <td>${esc(dtFmt(a.timestamp))}</td>
+  </tr>`).join("");
+}
+
+/* ---------- Agents ---------- */
+function renderAgents() {
+  const agents = A.data.agents || [];
+  $("#agentsContent").innerHTML = `
+    <button class="btn btn-p" style="margin-bottom:.8rem" onclick="openAgentForm()">+ وكيل جديد</button>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr>
+        <th>ID</th><th>الاسم</th><th>البريد</th><th>الدولة</th><th>العملة</th>
+        <th>سعر الصرف</th><th>الأكاديمية</th><th>الوكيل</th><th>الدين</th><th>الحالة</th><th>السحب</th><th>إجراءات</th>
+      </tr></thead>
+      <tbody>${agents.map(a => `<tr>
+        <td dir="ltr">${esc(a.id)}</td>
+        <td>${esc(a.name)}</td>
+        <td dir="ltr" style="font-size:.78rem">${esc(a.email)}</td>
+        <td>${esc(a.country)}</td>
+        <td>${esc(a.currency)}</td>
+        <td>${esc(a.exchange_rate)}</td>
+        <td>${(a.academy_share*100).toFixed(0)}%</td>
+        <td>${(a.agent_share*100).toFixed(0)}%</td>
+        <td class="money">$${money(a.debt_to_academy)}</td>
+        <td><span class="tag ${a.status}">${esc(a.status)}</span></td>
+        <td>${a.withdraw_ready?'✅':'❌'}</td>
+        <td>
+          <button class="btn btn-s btn-sm" onclick="openAgentForm('${esc(a.id)}')">تعديل</button>
+          <button class="btn btn-w btn-sm" onclick="setAgentStatus('${esc(a.id)}','suspended')">إيقاف</button>
+          <button class="btn btn-d btn-sm" onclick="setAgentStatus('${esc(a.id)}','deleted')">حذف</button>
+        </td>
+      </tr>`).join("") || `<tr><td colspan="12" style="text-align:center;color:#64748b">لا يوجد وكلاء</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+function openAgentForm(id) {
+  const agents = A.data.agents || [];
+  const a = id ? agents.find(x => String(x.id)===String(id)) : null;
+  const html = `
+    <div class="form">
+      <div class="form-row">
+        <label>البريد الإلكتروني<input id="aEmail" ${a?'disabled':''} value="${esc(a?.email||'')}" /></label>
+        <label>الاسم<input id="aName" value="${esc(a?.name||'')}" /></label>
+      </div>
+      <div class="form-row">
+        <label>الهاتف<input id="aPhone" value="${esc(a?.phone||'')}" /></label>
+        <label>الدولة (ISO)<input id="aCountry" placeholder="SA" value="${esc(a?.country||'')}" /></label>
+        <label>العملة<input id="aCurrency" placeholder="SAR" value="${esc(a?.currency||'')}" /></label>
+      </div>
+      <div class="form-row">
+        <label>سعر الصرف<input id="aRate" type="number" step="0.01" value="${esc(a?.exchange_rate||'1')}" /></label>
+        <label>حصة الأكاديمية (0-1)<input id="aAc" type="number" step="0.01" value="${esc(a?.academy_share??'0.6')}" /></label>
+        <label>حصة الوكيل (0-1)<input id="aAg" type="number" step="0.01" value="${esc(a?.agent_share??'0.4')}" /></label>
+      </div>
+      <div class="form-row">
+        <label>المشرف<input id="aSup" value="${esc(a?.supervisor||'')}" /></label>
+        <label>تفعيل السحب<select id="aWithdraw"><option value="no" ${a?.withdraw_ready?'':'selected'}>لا</option><option value="yes" ${a?.withdraw_ready?'selected':''}>نعم</option></select></label>
+      </div>
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.5rem">
+        <button class="btn btn-s" onclick="closeModal()">إلغاء</button>
+        <button class="btn btn-p" id="saveAgent">حفظ</button>
+      </div>
+    </div>
+  `;
+  openModal(a?"تعديل وكيل":"وكيل جديد", html);
+  $("#saveAgent").addEventListener("click", saveAgent);
+  window._editAgentId = a?.id || null;
+}
+
+async function saveAgent() {
+  const payload = {
+    email: $("#aEmail").value.trim(),
+    name: $("#aName").value.trim(),
+    phone: $("#aPhone").value.trim(),
+    country: $("#aCountry").value.trim().toUpperCase(),
+    currency: $("#aCurrency").value.trim().toUpperCase(),
+    exchange_rate: Number($("#aRate").value)||1,
+    academy_share: Number($("#aAc").value)||0.6,
+    agent_share: Number($("#aAg").value)||0.4,
+    supervisor: $("#aSup").value.trim(),
+    withdraw_ready: $("#aWithdraw").value === "yes"
+  };
+  let r;
+  if (window._editAgentId) {
+    payload.agent_id = window._editAgentId;
+    r = await api("adminUpdateAgent", payload);
+  } else {
+    r = await api("adminCreateAgent", payload);
+  }
+  if (r.ok) { A.data = r.data; closeModal(); renderAll(); toast(r.message||"تم.","ok"); }
+  else toast(r.message||"خطأ","err");
+}
+
+async function setAgentStatus(id, status) {
+  if (!confirm("تأكيد تغيير الحالة إلى "+status+"؟")) return;
+  const r = await api("adminSetAgentStatus", { agent_id: id, status });
+  if (r.ok) { A.data = r.data; renderAll(); toast("تم التحديث.","ok"); }
+  else toast(r.message||"خطأ","err");
+}
+
+/* ---------- Courses ---------- */
+function renderCourses() {
+  const courses = A.data.courses || [];
+  $("#coursesContent").innerHTML = `
+    <button class="btn btn-p" style="margin-bottom:.8rem" onclick="openCourseForm()">+ دورة جديدة</button>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>ID</th><th>الاسم</th><th>التصنيف</th><th>الوصف</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+      <tbody>${courses.map(c=>`<tr>
+        <td dir="ltr">${esc(c.id)}</td>
+        <td>${esc(c.name)}</td>
+        <td>${esc(c.category||"—")}</td>
+        <td style="max-width:300px;white-space:normal">${esc((c.description||"").slice(0,80))}</td>
+        <td><span class="tag ${c.status}">${esc(c.status)}</span></td>
+        <td><button class="btn btn-s btn-sm" onclick="openCourseForm('${esc(c.id)}')">تعديل</button></td>
+      </tr>`).join("") || `<tr><td colspan="6" style="text-align:center;color:#64748b">لا توجد دورات</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+function openCourseForm(id) {
+  const c = id ? (A.data.courses||[]).find(x=>String(x.id)===String(id)) : null;
+  const html = `
+    <div class="form">
+      <label>اسم الدورة<input id="cName" value="${esc(c?.name||'')}" /></label>
+      <label>الوصف<textarea id="cDesc">${esc(c?.description||'')}</textarea></label>
+      <div class="form-row">
+        <label>التصنيف<input id="cCat" value="${esc(c?.category||'')}" /></label>
+        <label>الحالة<select id="cStatus">
+          <option value="active" ${c?.status==='active'?'selected':''}>active</option>
+          <option value="inactive" ${c?.status==='inactive'?'selected':''}>inactive</option>
+        </select></label>
+      </div>
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.5rem">
+        <button class="btn btn-s" onclick="closeModal()">إلغاء</button>
+        <button class="btn btn-p" id="saveCourse">حفظ</button>
+      </div>
+    </div>
+  `;
+  openModal(c?"تعديل دورة":"دورة جديدة", html);
+  window._editCourseId = c?.id || null;
+  $("#saveCourse").addEventListener("click", async () => {
+    const p = {
+      name: $("#cName").value.trim(),
+      description: $("#cDesc").value.trim(),
+      category: $("#cCat").value.trim(),
+      status: $("#cStatus").value
+    };
+    if (window._editCourseId) p.course_id = window._editCourseId;
+    const r = await api("adminUpsertCourse", p);
+    if (r.ok) { A.data = r.data; closeModal(); renderAll(); toast(r.message||"تم.","ok"); }
+    else toast(r.message||"خطأ","err");
+  });
+}
+
+/* ---------- Prices ---------- */
+function renderPrices() {
+  const prices = A.data.prices || [];
+  $("#pricesContent").innerHTML = `
+    <button class="btn btn-p" style="margin-bottom:.8rem" onclick="openPriceForm()">+ سعر جديد</button>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>الدورة</th><th>الدولة</th><th>العملة</th><th>السعر المحلي</th><th>بالدولار</th><th>الرابط</th><th>الحالة</th><th></th></tr></thead>
+      <tbody>${prices.map(p=>`<tr>
+        <td dir="ltr">${esc(p.course_id)}</td>
+        <td>${esc(p.country)}</td>
+        <td>${esc(p.currency)}</td>
+        <td>${money(p.price_local)}</td>
+        <td class="money">$${money(p.price_usd)}</td>
+        <td dir="ltr" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:.75rem">${esc(p.purchase_link||"—")}</td>
+        <td><span class="tag ${p.status}">${esc(p.status)}</span></td>
+        <td><button class="btn btn-s btn-sm" onclick="openPriceForm('${esc(p.course_id)}','${esc(p.country)}')">تعديل</button></td>
+      </tr>`).join("") || `<tr><td colspan="8" style="text-align:center;color:#64748b">لا توجد أسعار</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+function openPriceForm(courseId, country) {
+  const p = courseId ? (A.data.prices||[]).find(x=>String(x.course_id)===String(courseId)&&x.country===country) : null;
+  const courses = A.data.courses || [];
+  const countries = [...new Set((A.data.prices||[]).map(x=>x.country).concat(["SA","EG","AE","KW","QA","OM","BH","JO","MA","DZ","TN","IQ","YE","SD","LY"]))];
+  const html = `
+    <div class="form">
+      <div class="form-row">
+        <label>الدورة<select id="pCourse" ${p?'disabled':''}>
+          ${courses.map(c=>`<option value="${esc(c.id)}" ${p?.course_id===c.id?'selected':''}>${esc(c.name)} (${esc(c.id)})</option>`).join("")}
+        </select></label>
+        <label>الدولة<select id="pCountry" ${p?'disabled':''}>
+          ${countries.map(c=>`<option value="${esc(c)}" ${p?.country===c?'selected':''}>${esc(c)}</option>`).join("")}
+        </select></label>
+      </div>
+      <div class="form-row">
+        <label>العملة<input id="pCurrency" value="${esc(p?.currency||'')}" /></label>
+        <label>السعر المحلي<input id="pLocal" type="number" step="0.01" value="${esc(p?.price_local||'')}" /></label>
+        <label>السعر بالدولار<input id="pUsd" type="number" step="0.01" value="${esc(p?.price_usd||'')}" /></label>
+      </div>
+      <label>رابط الشراء<input id="pLink" dir="ltr" value="${esc(p?.purchase_link||'')}" placeholder="https://..." /></label>
+      <label>الحالة<select id="pStatus">
+        <option value="active" ${p?.status==='active'?'selected':''}>active</option>
+        <option value="inactive" ${p?.status==='inactive'?'selected':''}>inactive</option>
+      </select></label>
+      <div style="display:flex;gap:.5rem;justify-content:flex-end">
+        <button class="btn btn-s" onclick="closeModal()">إلغاء</button>
+        <button class="btn btn-p" id="savePrice">حفظ</button>
+      </div>
+    </div>
+  `;
+  openModal(p?"تعديل سعر":"سعر جديد", html);
+  $("#savePrice").addEventListener("click", async () => {
+    const payload = {
+      course_id: $("#pCourse").value,
+      country: $("#pCountry").value,
+      currency: $("#pCurrency").value.trim().toUpperCase(),
+      price_local: Number($("#pLocal").value)||0,
+      price_usd: Number($("#pUsd").value)||0,
+      purchase_link: $("#pLink").value.trim(),
+      status: $("#pStatus").value
+    };
+    const r = await api("adminUpsertCoursePrice", payload);
+    if (r.ok) { A.data = r.data; closeModal(); renderAll(); toast(r.message||"تم.","ok"); }
+    else toast(r.message||"خطأ","err");
+  });
+}
+
+/* ---------- Sales ---------- */
+function renderSales() {
+  const sales = A.data.sales || [];
+  const agents = {}; (A.data.agents||[]).forEach(a=>agents[a.id]=a.name);
+  $("#salesContent").innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>ID</th><th>الوكيل</th><th>العميل</th><th>المبلغ</th><th>USD</th><th>حصة الأكاديمية</th><th>الحالة</th><th>ملغاة</th><th>التاريخ</th></tr></thead>
+      <tbody>${sales.map(s=>`<tr>
+        <td dir="ltr">${esc(s.id)}</td>
+        <td>${esc(agents[s.agent_id]||s.agent_id)}</td>
+        <td>${esc(s.customer_name)}</td>
+        <td>${money(s.amount_local)} ${esc(s.currency)}</td>
+        <td class="money">$${money(s.amount_usd)}</td>
+        <td class="money">$${money(s.academy_share_usd)}</td>
+        <td><span class="tag ${s.status}">${esc(s.status)}</span></td>
+        <td>${s.activation_cancelled?'✅':'—'}</td>
+        <td>${esc(dtFmt(s.created_at))}</td>
+      </tr>`).join("") || `<tr><td colspan="9" style="text-align:center;color:#64748b">لا توجد مبيعات</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+/* ---------- Transfers ---------- */
+function renderTransfers() {
+  const transfers = A.data.transfers || [];
+  const agents = {}; (A.data.agents||[]).forEach(a=>agents[a.id]=a.name);
+  $("#transfersContent").innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>ID</th><th>الوكيل</th><th>المبلغ</th><th>الطريقة</th><th>المرجع</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+      <tbody>${transfers.map(t=>`<tr>
+        <td dir="ltr">${esc(t.id)}</td>
+        <td>${esc(agents[t.agent_id]||t.agent_id)}</td>
+        <td class="money">$${money(t.amount_usd)}</td>
+        <td>${esc(t.method)}</td>
+        <td dir="ltr" style="font-size:.75rem">${esc(t.reference||"—")}</td>
+        <td><span class="tag ${t.status}">${esc(t.status)}</span></td>
+        <td>${esc(dtFmt(t.created_at))}</td>
+        <td>
+          ${t.status==='pending'?`
+            <button class="btn btn-ok btn-sm" onclick="setTransferStatus('${esc(t.id)}','confirmed')">تأكيد</button>
+            <button class="btn btn-d btn-sm" onclick="setTransferStatus('${esc(t.id)}','rejected')">رفض</button>`:''}
+        </td>
+      </tr>`).join("") || `<tr><td colspan="8" style="text-align:center;color:#64748b">لا توجد تحويلات</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+async function setTransferStatus(id, status) {
+  const r = await api("adminSetTransferStatus", { transfer_id: id, status });
+  if (r.ok) { A.data = r.data; renderAll(); toast("تم التحديث.","ok"); }
+  else toast(r.message||"خطأ","err");
+}
+
+/* ---------- Withdrawals ---------- */
+function renderWithdrawals() {
+  const w = A.data.withdrawals || [];
+  const agents = {}; (A.data.agents||[]).forEach(a=>agents[a.id]=a.name);
+  $("#withdrawalsContent").innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>ID</th><th>الوكيل</th><th>المبلغ</th><th>الطريقة</th><th>الحساب</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+      <tbody>${w.map(x=>`<tr>
+        <td dir="ltr">${esc(x.id)}</td>
+        <td>${esc(agents[x.agent_id]||x.agent_id)}</td>
+        <td class="money">$${money(x.amount_usd)}</td>
+        <td>${esc(x.method)}</td>
+        <td dir="ltr" style="font-size:.75rem">${esc(x.account)}</td>
+        <td><span class="tag ${x.status}">${esc(x.status)}</span></td>
+        <td>${esc(dtFmt(x.created_at))}</td>
+        <td>${x.status==='pending'?`
+          <button class="btn btn-ok btn-sm" onclick="setWithdrawalStatus('${esc(x.id)}','paid')">دفع</button>
+          <button class="btn btn-d btn-sm" onclick="setWithdrawalStatus('${esc(x.id)}','rejected')">رفض</button>`:''}</td>
+      </tr>`).join("") || `<tr><td colspan="8" style="text-align:center;color:#64748b">لا توجد طلبات</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+async function setWithdrawalStatus(id, status) {
+  const r = await api("adminSetWithdrawalStatus", { withdrawal_id: id, status });
+  if (r.ok) { A.data = r.data; renderAll(); toast("تم.","ok"); }
+  else toast(r.message||"خطأ","err");
+}
+
+/* ---------- Refunds ---------- */
+function renderRefunds() {
+  const r = A.data.refunds || [];
+  const agents = {}; (A.data.agents||[]).forEach(a=>agents[a.id]=a.name);
+  $("#refundsContent").innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>ID</th><th>المبيعة</th><th>الوكيل</th><th>المبلغ</th><th>خصم من الدين</th><th>السبب</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+      <tbody>${r.map(x=>`<tr>
+        <td dir="ltr">${esc(x.id)}</td>
+        <td dir="ltr">${esc(x.sale_id)}</td>
+        <td>${esc(agents[x.agent_id]||x.agent_id)}</td>
+        <td class="money">$${money(x.amount_usd)}</td>
+        <td>${x.deduct_from_debt?'✅':'—'}</td>
+        <td style="max-width:200px;white-space:normal;font-size:.8rem">${esc(x.reason)}</td>
+        <td><span class="tag ${x.status}">${esc(x.status)}</span></td>
+        <td>${esc(dtFmt(x.created_at))}</td>
+        <td>${x.status==='pending'?`
+          <button class="btn btn-ok btn-sm" onclick="setRefundStatus('${esc(x.id)}','approved')">موافقة</button>
+          <button class="btn btn-d btn-sm" onclick="setRefundStatus('${esc(x.id)}','rejected')">رفض</button>`:''}</td>
+      </tr>`).join("") || `<tr><td colspan="9" style="text-align:center;color:#64748b">لا توجد طلبات</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+async function setRefundStatus(id, status) {
+  if (status === "approved" && !confirm("الموافقة ستلغي تفعيل العميل. متابعة؟")) return;
+  const r = await api("adminSetRefundStatus", { refund_id: id, status });
+  if (r.ok) { A.data = r.data; renderAll(); toast("تم.","ok"); }
+  else toast(r.message||"خطأ","err");
+}
+
+/* ---------- Sub-agents (snapshot) ---------- */
+function renderSubAgents() {
+  const sa = A.data.sub_agents || [];
+  const agents = {}; (A.data.agents||[]).forEach(a=>agents[a.id]=a.name);
+  $("#subagentsContent").innerHTML = `
+    <p style="color:#64748b;font-size:.85rem;margin-bottom:.8rem">قائمة المناديب المُرسَلة من كل وكيل (اسم + هاتف + نسبة فقط).</p>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>الوكيل</th><th>المندوب</th><th>الهاتف</th><th>النسبة</th><th>الحالة</th></tr></thead>
+      <tbody>${sa.map(x=>`<tr>
+        <td>${esc(agents[x.agent_id]||x.agent_id)}</td>
+        <td>${esc(x.name)}</td>
+        <td dir="ltr">${esc(x.phone)}</td>
+        <td>${(x.share*100).toFixed(0)}%</td>
+        <td><span class="tag ${x.status}">${esc(x.status)}</span></td>
+      </tr>`).join("") || `<tr><td colspan="5" style="text-align:center;color:#64748b">لا يوجد مناديب</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+/* ---------- Activity log ---------- */
+function renderActivity() {
+  const acts = A.data.activity || [];
+  $("#activityContent").innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>الوقت</th><th>النوع</th><th>الفاعل</th><th>الإجراء</th><th>تفاصيل</th></tr></thead>
+      <tbody>${acts.map(a=>`<tr>
+        <td style="font-size:.75rem">${esc(dtFmt(a.timestamp))}</td>
+        <td>${esc(a.actor_type)}</td>
+        <td dir="ltr" style="font-size:.75rem">${esc(a.actor_email||"—")}</td>
+        <td>${esc(a.action)}</td>
+        <td style="font-size:.7rem;max-width:250px;overflow:hidden;text-overflow:ellipsis">${esc(a.details||"")}</td>
+      </tr>`).join("") || `<tr><td colspan="5" style="text-align:center;color:#64748b">لا يوجد نشاط</td></tr>`}</tbody>
+    </table></div>
+  `;
+}
+
+/* ---------- Reports ---------- */
+function renderReports() {
+  const curMonth = new Date().toISOString().slice(0,7);
+  $("#reportsContent").innerHTML = `
+    <div class="form-row" style="margin-bottom:1rem">
+      <label>الشهر<input type="month" id="rMonth" value="${curMonth}" /></label>
+    </div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
+      <button class="btn btn-p" onclick="loadMonthlyReport()">عرض التقرير</button>
+      <button class="btn btn-s" onclick="exportCSV('sales')">تصدير المبيعات CSV</button>
+      <button class="btn btn-s" onclick="exportCSV('transfers')">تصدير التحويلات CSV</button>
+      <button class="btn btn-s" onclick="exportCSV('withdrawals')">تصدير السحوبات CSV</button>
+      <button class="btn btn-s" onclick="exportCSV('refunds')">تصدير الاستردادات CSV</button>
+    </div>
+    <div id="reportResult"></div>
+  `;
+}
+
+async function loadMonthlyReport() {
+  const month = $("#rMonth").value;
+  const r = await api("adminMonthlyReport", { month });
+  if (!r.ok) { toast(r.message||"خطأ","err"); return; }
+  const x = r.report;
+  $("#reportResult").innerHTML = `
+    <div class="stats">
+      <div class="stat"><span>عدد المبيعات</span><strong>${x.sales_count}</strong></div>
+      <div class="stat"><span>إجمالي المبيعات</span><strong>$${money(x.total_sales_usd)}</strong></div>
+      <div class="stat"><span>حصة الأكاديمية</span><strong>$${money(x.academy_share_usd)}</strong></div>
+      <div class="stat"><span>حصة الوكلاء</span><strong>$${money(x.agent_share_usd)}</strong></div>
+      <div class="stat"><span>التحويلات المستلمة</span><strong>$${money(x.transfers_received_usd)}</strong></div>
+    </div>
+  `;
+}
+
+async function exportCSV(type) {
+  const month = $("#rMonth").value;
+  const r = await api("adminExportCSV", { csv_type: type, month });
+  if (!r.ok) { toast(r.message||"خطأ","err"); return; }
+  const blob = new Blob(["\ufeff"+r.csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = r.filename || (type+".csv");
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("تم التصدير.","ok");
+}
+
+/* ---------- Init ---------- */
+initGIS().catch(e => toast("تعذر تحميل Google Sign-In","err"));
+</script>
+</body>
+</html>
