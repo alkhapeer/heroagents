@@ -378,9 +378,12 @@ function renderAgents() {
 
 function openAgentForm(id) {
   const agents = A.data.agents || [];
-  const a = id ? agents.find(x => String(x.id)===String(id)) : null;
+  const a = id ? agents.find(x => String(x.id) === String(id)) : null;
+  window._editAgentId = id || null;  // ✅ تمرير مباشر للمعرّف
+
   const html = `
     <div class="form">
+      <input type="hidden" id="aId" value="${esc(a?.id||'')}" />
       <div class="form-row">
         <label>البريد الإلكتروني<input id="aEmail" ${a?'disabled':''} value="${esc(a?.email||'')}" /></label>
         <label>الاسم<input id="aName" value="${esc(a?.name||'')}" /></label>
@@ -392,12 +395,21 @@ function openAgentForm(id) {
       </div>
       <div class="form-row">
         <label>سعر الصرف<input id="aRate" type="number" step="0.01" value="${esc(a?.exchange_rate||'1')}" /></label>
-        <label>حصة الأكاديمية (0-1)<input id="aAc" type="number" step="0.01" value="${esc(a?.academy_share??'0.6')}" /></label>
-        <label>حصة الوكيل (0-1)<input id="aAg" type="number" step="0.01" value="${esc(a?.agent_share??'0.4')}" /></label>
+        <label>حصة الأكاديمية (0.6 أو 60)<input id="aAc" type="number" step="0.01" value="${esc(a?(a.academy_share>1?a.academy_share:a.academy_share*100):60)}" /></label>
+        <label>حصة الوكيل (0.4 أو 40)<input id="aAg" type="number" step="0.01" value="${esc(a?(a.agent_share>1?a.agent_share:a.agent_share*100):40)}" /></label>
       </div>
       <div class="form-row">
+        <label>الحالة<select id="aStatus">
+          <option value="active" ${a?.status==='active'?'selected':''}>active — مفعّل</option>
+          <option value="pending" ${a?.status==='pending'?'selected':''}>pending — قيد المراجعة</option>
+          <option value="suspended" ${a?.status==='suspended'?'selected':''}>suspended — موقوف</option>
+          <option value="deleted" ${a?.status==='deleted'?'selected':''}>deleted — محذوف</option>
+        </select></label>
         <label>المشرف<input id="aSup" value="${esc(a?.supervisor||'')}" /></label>
-        <label>تفعيل السحب<select id="aWithdraw"><option value="no" ${a?.withdraw_ready?'':'selected'}>لا</option><option value="yes" ${a?.withdraw_ready?'selected':''}>نعم</option></select></label>
+        <label>تفعيل السحب<select id="aWithdraw">
+          <option value="no" ${a?.withdraw_ready?'':'selected'}>لا</option>
+          <option value="yes" ${a?.withdraw_ready?'selected':''}>نعم</option>
+        </select></label>
       </div>
       <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.5rem">
         <button class="btn btn-s" onclick="closeModal()">إلغاء</button>
@@ -406,39 +418,44 @@ function openAgentForm(id) {
     </div>
   `;
   openModal(a?"تعديل وكيل":"وكيل جديد", html);
-  $("#saveAgent").addEventListener("click", saveAgent);
-  window._editAgentId = a?.id || null;
-}
 
-async function saveAgent() {
-  const payload = {
-    email: $("#aEmail").value.trim(),
-    name: $("#aName").value.trim(),
-    phone: $("#aPhone").value.trim(),
-    country: $("#aCountry").value.trim().toUpperCase(),
-    currency: $("#aCurrency").value.trim().toUpperCase(),
-    exchange_rate: Number($("#aRate").value)||1,
-    academy_share: Number($("#aAc").value)||0.6,
-    agent_share: Number($("#aAg").value)||0.4,
-    supervisor: $("#aSup").value.trim(),
-    withdraw_ready: $("#aWithdraw").value === "yes"
-  };
-  let r;
-  if (window._editAgentId) {
-    payload.agent_id = window._editAgentId;
-    r = await api("adminUpdateAgent", payload);
-  } else {
-    r = await api("adminCreateAgent", payload);
-  }
-  if (r.ok) { A.data = r.data; closeModal(); renderAll(); toast(r.message||"تم.","ok"); }
-  else toast(r.message||"خطأ","err");
-}
+  document.getElementById("saveAgent").addEventListener("click", async () => {
+    const btn = document.getElementById("saveAgent");
+    btn.disabled = true; btn.textContent = "جارٍ الحفظ…";
 
-async function setAgentStatus(id, status) {
-  if (!confirm("تأكيد تغيير الحالة إلى "+status+"؟")) return;
-  const r = await api("adminSetAgentStatus", { agent_id: id, status });
-  if (r.ok) { A.data = r.data; renderAll(); toast("تم التحديث.","ok"); }
-  else toast(r.message||"خطأ","err");
+    const payload = {
+      name: document.getElementById("aName").value.trim(),
+      phone: document.getElementById("aPhone").value.trim(),
+      country: document.getElementById("aCountry").value.trim().toUpperCase(),
+      currency: document.getElementById("aCurrency").value.trim().toUpperCase(),
+      exchange_rate: Number(document.getElementById("aRate").value) || 1,
+      academy_share: Number(document.getElementById("aAc").value),
+      agent_share: Number(document.getElementById("aAg").value),
+      status: document.getElementById("aStatus").value,
+      supervisor: document.getElementById("aSup").value.trim(),
+      withdraw_ready: document.getElementById("aWithdraw").value === "yes"
+    };
+
+    let r;
+    if (window._editAgentId) {
+      payload.agent_id = window._editAgentId;  // ✅ المعرّف يُرسل صريحًا
+      r = await api("adminUpdateAgent", payload);
+    } else {
+      payload.email = document.getElementById("aEmail").value.trim();
+      r = await api("adminCreateAgent", payload);
+    }
+
+    btn.disabled = false; btn.textContent = "حفظ";
+
+    if (r.ok) {
+      A.data = r.data;
+      closeModal();
+      renderAll();
+      toast(r.message || "تم الحفظ.", "ok");
+    } else {
+      toast(r.message || "خطأ في الحفظ.", "err");
+    }
+  });
 }
 
 /* ---------- Courses ---------- */
