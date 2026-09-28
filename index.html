@@ -399,12 +399,22 @@ async function initGIS() {
     AG.withdrawals = cached.withdrawals || [];
     AG.refunds = cached.refunds || [];
     AG.balance = cached.balance || null;
-    AG.subAgents = loadSubAgents();
+        AG.subAgents = loadSubAgents();
     AG.loadedAt = cached.loadedAt || 0;
     showApp();
-    // تحديث صامت
-    if (Date.now() - AG.loadedAt > HERO_CONFIG.SYNC_TTL_MS) {
-      syncSilent();
+
+    // ✅ فحص الحالة الأمني مرة واحدة شهريًا فقط
+    const lastHb = Number(localStorage.getItem("hero_last_heartbeat") || 0);
+    const hbGap = HERO_CONFIG.HEARTBEAT_DAYS * 24 * 60 * 60 * 1000;
+    if (Date.now() - lastHb > hbGap) {
+      // طلب واحد فقط كل 30 يومًا
+      api("agentHeartbeat").then(r => {
+        if (r.ok) {
+          localStorage.setItem("hero_last_heartbeat", String(Date.now()));
+        } else {
+          handleAuthError(r);
+        }
+      });
     }
   }
 }
@@ -850,11 +860,7 @@ if ("serviceWorker" in navigator) {
 }
 
 /* ---------- Heartbeat (كل يوم) ---------- */
-setInterval(async () => {
-  if (!AG.token) return;
-  const r = await api("agentHeartbeat");
-  if (!r.ok) handleAuthError(r);
-}, HERO_CONFIG.HEARTBEAT_MS);
+/* ✅ لا يوجد setInterval — الفحص يتم مرة واحدة شهريًا عند فتح التطبيق */
 
 /* ---------- Init ---------- */
 initGIS().catch(() => toast("تعذر تحميل Google Sign-In","err"));
